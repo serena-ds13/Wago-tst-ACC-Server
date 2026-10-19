@@ -189,12 +189,12 @@ pipeline {
             }
         }
 
-        stage('SonarQube ACC') {
+        stage('SonarQube') {
             steps {
                 script {
                     def scannerHome = tool 'SonarScanner'
 
-                    withSonarQubeEnv('SonarQube') {
+                    withSonarQubeEnv('SonarQube ACC') {
                         
                             sh """
                                 echo '=== Construction liste SARIF ==='
