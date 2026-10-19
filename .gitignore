@@ -1,0 +1,17 @@
+# Configuration locale de l'automate (identifiants / hôte) — NE PAS versionner
+wago_plc.ini
+.env
+
+# Environnements virtuels
+.venv/
+venv/
+env/
+
+# Caches Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Sorties de build PyInstaller
+build/
+dist/

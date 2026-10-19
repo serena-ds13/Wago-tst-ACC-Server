@@ -1,0 +1,75 @@
+title = "org-gitleaks-solid"
+
+# =========================
+# Base: règles officielles Gitleaks (AWS/GitHub/Slack/Stripe/etc.)
+# =========================
+[extend]
+useDefault = true
+
+# =========================
+# Allowlist (anti-bruit)
+# =========================
+[allowlist]
+description = "Common noise suppression"
+paths = [
+  # Dépendances / artefacts build / coverage
+  '''(?i)(^|/)(node_modules|dist|build|target|bin|obj|vendor|coverage|\.next|\.nuxt|out)(/|$)''',
+  # Git internals
+  '''(?i)(^|/)\.git(/|$)''',
+  # Binaries / archives / images / fonts
+  '''(?i)\.(png|jpg|jpeg|gif|svg|ico|pdf|zip|tar|gz|tgz|7z|rar|jar|war|exe|dll|so|dylib|class|pdb|woff2?|ttf|eot)$'''
+]
+
+# Stopwords / placeholders de test (sinon ça casse la vie des devs)
+regexes = [
+  '''(?i)\b(password|passwd|pwd|secret|token|api[_-]?key|client[_-]?secret)\b\s*[:=]\s*["']?(changeme|change_me|dummy|example|sample|test|testing|password|passw0rd|null|nil|none|notasecret|replace_me)["']?\b''',
+  '''(?i)\b(authorization|auth)\b\s*[:=]\s*["']?(bearer\s+)?(your[_-]?token|example|dummy)["']?\b'''
+]
+
+# =========================
+# Règles "hardcoded secrets" (pour les password: ... / token=... etc.)
+# =========================
+
+[[rules]]
+id = "hardcoded-credential-assignment"
+description = "Hardcoded credentials in config/code (password/secret/token/api key...)"
+regex = '''(?i)(?:^|[\s,{(\[])(password|passwd|pwd|passphrase|secret|secrets|token|id[_-]?token|access[_-]?token|refresh[_-]?token|api[_-]?key|apikey|access[_-]?key|secret[_-]?key|client[_-]?secret|private[_-]?key|auth[_-]?token|authorization)\s*[:=]\s*["']?([^\s"'#]{4,})["']?'''
+secretGroup = 2
+entropy = 0.0
+keywords = [
+  "password","passwd","pwd","passphrase","secret","secrets","token",
+  "id_token","access_token","refresh_token",
+  "api_key","apikey","access_key","secret_key","client_secret",
+  "private_key","auth_token","authorization"
+]
+tags = ["hardcoded", "config", "credential"]
+
+[[rules]]
+id = "url-basic-auth"
+description = "Credentials embedded in URL (basic auth)"
+regex = '''(?i)\b[a-z][a-z0-9+\-.]*://[^/\s:@]+:([^@\s/]{3,})@'''
+secretGroup = 1
+entropy = 0.0
+tags = ["hardcoded", "url"]
+
+[[rules]]
+id = "jwt-token"
+description = "JWT token"
+regex = '''\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b'''
+entropy = 0.0
+tags = ["jwt", "token"]
+
+[[rules]]
+id = "private-key-pem"
+description = "PEM private key block"
+regex = '''-----BEGIN (?:RSA |EC |OPENSSH |DSA |ED25519 )?PRIVATE KEY-----'''
+tags = ["key", "pem"]
+
+# Filet de sécurité (optionnel mais utile): entropie générique
+[[rules]]
+id = "generic-high-entropy-string"
+description = "Generic high-entropy secret candidate (last-resort net)"
+regex = '''(?i)\b([a-z0-9_\-]{20,}\.[a-z0-9_\-]{10,}\.[a-z0-9_\-]{10,}|[a-z0-9\/+]{40,}={0,2}|[a-f0-9]{32,})\b'''
+secretGroup = 1
+entropy = 3.7
+tags = ["entropy", "generic"]

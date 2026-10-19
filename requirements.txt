@@ -1,0 +1,13 @@
+# Dépendances du Wago Log Viewer
+# Installation : pip install -r requirements.txt
+pandas>=2.0
+numpy>=1.24
+PySide6>=6.5
+pyqtgraph>=0.13
+# SFTP : lecture du fichier sur l'automate (mode temps réel).
+# Sécurité (rapport SonarQube) : ≥5.0.0 couvre Terrapin (CVE-2023-48795)
+# ET la faiblesse SHA-1 dans les clés RSA (CVE-2026-44405).
+paramiko>=5.0.0
+
+# Optionnel — uniquement pour générer l'exécutable Windows :
+PyInstaller
