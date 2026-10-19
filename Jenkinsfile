@@ -189,7 +189,7 @@ pipeline {
             }
         }
 
-        stage('SonarQube') {
+        stage('SonarQube ACC') {
             steps {
                 script {
                     def scannerHome = tool 'SonarScanner'
